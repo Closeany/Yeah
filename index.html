@@ -25,8 +25,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative; 
             z-index: 10; 
-            
-            /* 🚀 增加一个固定宽度，防止文字换行导致布局抖动 */
             width: 350px; 
         }
 
@@ -36,11 +34,9 @@
             margin-bottom: 30px;
         }
 
-        /* === 按钮容器修改 === */
         .btn-group {
             position: relative;
             height: 60px;
-            /* 🚀 关键修改：删掉 flex 居中，改用固定宽度 */
             width: 100%; 
         }
 
@@ -51,10 +47,8 @@
             border-radius: 50px;
             cursor: pointer;
             z-index: 100; 
-            
-            /* 🚀 关键修改：让按钮一开始就绝对定位 */
             position: absolute; 
-            bottom: 0; /* 都在底部 */
+            bottom: 0; /* ⚠️ 罪魁祸首之一 */
         }
 
         /* === Yes 按钮 === */
@@ -63,8 +57,6 @@
             color: white;
             box-shadow: 0 4px 6px rgba(255, 77, 77, 0.3);
             transition: all 0.3s ease; 
-            
-            /* 📍 锁定位置：左边 */
             left: 50px;
         }
         #yesBtn:hover {
@@ -77,9 +69,7 @@
             background-color: #e0e0e0;
             color: #333;
             transition: all 0.05s ease; 
-            
-            /* 📍 锁定位置：右边 */
-            right: 50px;
+            right: 50px; /* ⚠️ 罪魁祸首之二 */
         }
 
         /* === 背景爱心 === */
@@ -139,11 +129,15 @@
             const newLeft = centerX + randomOffsetX - (noBtn.offsetWidth / 2);
             const newTop = centerY + randomOffsetY - (noBtn.offsetHeight / 2);
 
-            // 只要一动，它就会变成 fixed (相对于屏幕定位)，从而飞走
-            // 但因为 Yes 是 absolute (相对于容器定位)，所以 Yes 不会受影响
+            // 1. 设置新位置 (fixed)
             noBtn.style.position = 'fixed'; 
             noBtn.style.left = newLeft + 'px';
             noBtn.style.top = newTop + 'px';
+
+            // 🚀 2. 关键修复：解除 CSS 中的 right 和 bottom 限制
+            // 告诉浏览器："不要再管原来的 right 和 bottom 了，自动适应内容大小就好"
+            noBtn.style.right = 'auto';
+            noBtn.style.bottom = 'auto';
         }
 
         yesBtn.addEventListener('click', () => {
