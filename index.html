@@ -11,13 +11,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ffe6e6; /* 浅粉色背景 */
+            background-color: #ffe6e6;
             font-family: 'Arial', sans-serif;
             overflow: hidden; 
             position: relative; 
         }
 
-        /* === 中间对话框 (层级最高) === */
         .container {
             text-align: center;
             background: white;
@@ -25,7 +24,10 @@
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative; 
-            z-index: 10; /* 确保盖住背景 */
+            z-index: 10; 
+            
+            /* 🚀 增加一个固定宽度，防止文字换行导致布局抖动 */
+            width: 350px; 
         }
 
         h1 {
@@ -34,12 +36,12 @@
             margin-bottom: 30px;
         }
 
+        /* === 按钮容器修改 === */
         .btn-group {
             position: relative;
             height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            /* 🚀 关键修改：删掉 flex 居中，改用固定宽度 */
+            width: 100%; 
         }
 
         button {
@@ -48,50 +50,57 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            margin: 0 10px;
             z-index: 100; 
+            
+            /* 🚀 关键修改：让按钮一开始就绝对定位 */
+            position: absolute; 
+            bottom: 0; /* 都在底部 */
         }
 
-        /* Yes 按钮 */
+        /* === Yes 按钮 === */
         #yesBtn {
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 4px 6px rgba(255, 77, 77, 0.3);
             transition: all 0.3s ease; 
+            
+            /* 📍 锁定位置：左边 */
+            left: 50px;
         }
         #yesBtn:hover {
             transform: scale(1.1);
             background-color: #ff3333;
         }
 
-        /* No 按钮 */
+        /* === No 按钮 === */
         #noBtn {
             background-color: #e0e0e0;
             color: #333;
-            position: relative; 
-            transition: all 0.05s ease; /* 极速闪避 */
+            transition: all 0.05s ease; 
+            
+            /* 📍 锁定位置：右边 */
+            right: 50px;
         }
 
-        /* === 背景爱心样式 === */
+        /* === 背景爱心 === */
         .heart-bg {
             position: absolute;
             color: #ff9999; 
             top: 100%; 
             left: 0;
             opacity: 0; 
-            z-index: 0; /* 在背景层 */
+            z-index: 0; 
             user-select: none; 
             pointer-events: none;
         }
 
-        /* 爱心飘动动画 */
         @keyframes floatHeart {
             0% {
                 transform: translateY(0) translateX(0) rotate(0deg);
                 opacity: 0;
             }
             10% {
-                opacity: 0.8; /* 稍微调高一点不透明度，让大爱心更清晰 */
+                opacity: 0.8; 
             }
             100% {
                 transform: translateY(-110vh) translateX(100px) rotate(20deg);
@@ -113,7 +122,6 @@
     </div>
 
     <script>
-        // === 1. No 按钮逻辑 ===
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         
@@ -131,6 +139,8 @@
             const newLeft = centerX + randomOffsetX - (noBtn.offsetWidth / 2);
             const newTop = centerY + randomOffsetY - (noBtn.offsetHeight / 2);
 
+            // 只要一动，它就会变成 fixed (相对于屏幕定位)，从而飞走
+            // 但因为 Yes 是 absolute (相对于容器定位)，所以 Yes 不会受影响
             noBtn.style.position = 'fixed'; 
             noBtn.style.left = newLeft + 'px';
             noBtn.style.top = newTop + 'px';
@@ -140,30 +150,21 @@
             alert("我就知道你会答应的！爱死你了！❤️");
         });
 
-        // === 2. 背景爱心生成逻辑 (已修改) ===
         function createHearts() {
             setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('heart-bg');
                 heart.innerHTML = '❤'; 
-                
                 heart.style.left = Math.random() * 100 + 'vw';
-                
-                // 🚀 修改点 1：让爱心变大
-                // 以前是 10~30px，现在改成 20~50px
                 const size = Math.random() * 30 + 20; 
                 heart.style.fontSize = size + 'px';
-                
                 const duration = Math.random() * 5 + 3;
                 heart.style.animation = `floatHeart ${duration}s linear infinite`;
-                
                 document.body.appendChild(heart);
-
                 setTimeout(() => {
                     heart.remove();
                 }, duration * 1000);
-
-            }, 100); // 🚀 修改点 2：频率变高 (100ms 生成一个，如果不满足还可以改成 50)
+            }, 100); 
         }
 
         createHearts();
