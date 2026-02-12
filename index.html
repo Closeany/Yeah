@@ -13,7 +13,7 @@
             align-items: center;
             background-color: #ffe6e6;
             font-family: 'Arial', sans-serif;
-            overflow: hidden; /* 禁止滚动条 */
+            overflow: hidden; 
         }
         .container {
             text-align: center;
@@ -22,7 +22,7 @@
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative; 
-            z-index: 1; /* 确保容器在背景之上 */
+            z-index: 1; 
         }
         h1 {
             color: #ff4d4d;
@@ -42,14 +42,14 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.2s; /* 增加平滑过渡效果 */
+            transition: all 0.3s ease; /* 让移动更平滑一点 */
             margin: 0 10px;
+            z-index: 100; /* 确保按钮在最上层 */
         }
         #yesBtn {
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 4px 6px rgba(255, 77, 77, 0.3);
-            z-index: 10;
         }
         #yesBtn:hover {
             transform: scale(1.1);
@@ -58,8 +58,8 @@
         #noBtn {
             background-color: #e0e0e0;
             color: #333;
-            position: absolute; /* 绝对定位，方便移动 */
-            /* 初始位置由 flex 布局控制，一旦移动就会脱离文档流 */
+            /* 关键修改：这里删掉了 absolute，让它一开始正常显示 */
+            position: relative; 
         }
     </style>
 </head>
@@ -77,34 +77,26 @@
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         
-        // 获取 Yes 按钮的位置，作为"基地"
-        // 我们会让 No 按钮永远围绕在 Yes 按钮周围跳动
-        
         noBtn.addEventListener('mouseover', moveButton);
         noBtn.addEventListener('touchstart', moveButton);
 
         function moveButton() {
             // 限制移动范围 (单位 px)
-            // 比如 200 代表它只会在距离中心 200px 的方形区域内乱跑
+            // 200 代表距离中心 200px 的方形区域
             const range = 200; 
             
-            // 获取屏幕中心点
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
             
-            // 计算新的随机位置
-            // Math.random() 生成 0~1
-            // (Math.random() * range * 2) - range 会生成 -200 到 +200 之间的数
             const randomOffsetX = (Math.random() * range * 2) - range;
             const randomOffsetY = (Math.random() * range * 2) - range;
 
-            // 设置新位置 = 中心点 + 随机偏移量
-            // 这样它永远是围绕屏幕中心跳动，不会跑远
             const newLeft = centerX + randomOffsetX - (noBtn.offsetWidth / 2);
             const newTop = centerY + randomOffsetY - (noBtn.offsetHeight / 2);
 
-            // 应用位置
-            noBtn.style.position = 'fixed'; // 使用 fixed 防止受父元素影响
+            // 当第一次移动时，JS 会强制把它变成 fixed
+            // 这样它就脱离文档流开始乱跑了
+            noBtn.style.position = 'fixed'; 
             noBtn.style.left = newLeft + 'px';
             noBtn.style.top = newTop + 'px';
         }
