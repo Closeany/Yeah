@@ -11,9 +11,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ffe6e6; /* 浅粉色背景 */
+            background-color: #ffe6e6;
             font-family: 'Arial', sans-serif;
-            overflow: hidden; /* 防止按钮跑出去出现滚动条 */
+            overflow: hidden; /* 禁止滚动条 */
         }
         .container {
             text-align: center;
@@ -21,6 +21,8 @@
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative; 
+            z-index: 1; /* 确保容器在背景之上 */
         }
         h1 {
             color: #ff4d4d;
@@ -29,7 +31,10 @@
         }
         .btn-group {
             position: relative;
-            height: 60px; /* 给按钮留出空间 */
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         button {
             padding: 10px 30px;
@@ -37,13 +42,14 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s; /* 增加平滑过渡效果 */
             margin: 0 10px;
         }
         #yesBtn {
             background-color: #ff4d4d;
             color: white;
             box-shadow: 0 4px 6px rgba(255, 77, 77, 0.3);
+            z-index: 10;
         }
         #yesBtn:hover {
             transform: scale(1.1);
@@ -52,7 +58,8 @@
         #noBtn {
             background-color: #e0e0e0;
             color: #333;
-            position: relative; /* 初始相对定位 */
+            position: absolute; /* 绝对定位，方便移动 */
+            /* 初始位置由 flex 布局控制，一旦移动就会脱离文档流 */
         }
     </style>
 </head>
@@ -61,39 +68,49 @@
     <div class="container">
         <h1>Are u my valentine? 💖</h1>
         <div class="btn-group">
-            <button id="yesBtn">Yes!</button>
-            <button id="noBtn">算了吧我还有别人</button>
+            <button id="yesBtn">Yes! 😍</button>
+            <button id="noBtn">No 😢</button>
         </div>
     </div>
 
     <script>
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
-
-        // 当鼠标靠近 No 按钮时
+        
+        // 获取 Yes 按钮的位置，作为"基地"
+        // 我们会让 No 按钮永远围绕在 Yes 按钮周围跳动
+        
         noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('touchstart', moveButton); // 增加手机触摸支持
+        noBtn.addEventListener('touchstart', moveButton);
 
         function moveButton() {
-            // 将定位改为绝对定位，这样它可以自由移动
-            noBtn.style.position = 'absolute';
+            // 限制移动范围 (单位 px)
+            // 比如 200 代表它只会在距离中心 200px 的方形区域内乱跑
+            const range = 200; 
             
-            // 计算屏幕内的随机位置
-            const maxWidth = window.innerWidth - noBtn.offsetWidth;
-            const maxHeight = window.innerHeight - noBtn.offsetHeight;
+            // 获取屏幕中心点
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
             
-            const randomX = Math.random() * maxWidth;
-            const randomY = Math.random() * maxHeight;
-            
-            noBtn.style.left = randomX + 'px';
-            noBtn.style.top = randomY + 'px';
+            // 计算新的随机位置
+            // Math.random() 生成 0~1
+            // (Math.random() * range * 2) - range 会生成 -200 到 +200 之间的数
+            const randomOffsetX = (Math.random() * range * 2) - range;
+            const randomOffsetY = (Math.random() * range * 2) - range;
+
+            // 设置新位置 = 中心点 + 随机偏移量
+            // 这样它永远是围绕屏幕中心跳动，不会跑远
+            const newLeft = centerX + randomOffsetX - (noBtn.offsetWidth / 2);
+            const newTop = centerY + randomOffsetY - (noBtn.offsetHeight / 2);
+
+            // 应用位置
+            noBtn.style.position = 'fixed'; // 使用 fixed 防止受父元素影响
+            noBtn.style.left = newLeft + 'px';
+            noBtn.style.top = newTop + 'px';
         }
 
-        // 当点击 Yes 按钮时
         yesBtn.addEventListener('click', () => {
             alert("我就知道你会答应的！爱死你了！❤️");
-            // 你也可以把这里改成跳转到一首歌或一张照片，例如：
-            // window.location.href = "https://www.youtube.com/watch?v=你的歌";
         });
     </script>
 </body>
