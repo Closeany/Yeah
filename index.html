@@ -110,22 +110,33 @@
             100% { top: 110vh; transform: translateX(var(--random-x)) rotate(var(--random-rotate)); opacity: 0; } 
         }
 
-        /* 组成巨大爱心的小粒子 */
+        /* 🚀 组成巨大爱心的小粒子 (修改了动画参数) */
         .shape-heart {
             position: fixed;
             color: #ff0000;
             font-size: 25px;
             pointer-events: none;
             z-index: 1000; 
-            animation: burstHeart 3.5s forwards ease-in-out; 
+            /* 缩短动画时间到 2.5s，使用 ease-out 让扩散更有冲力 */
+            animation: burstHeart 2.5s forwards ease-out; 
             text-shadow: 0 0 15px rgba(255, 0, 0, 0.6); 
         }
 
+        /* 🚀 新的大爱心动画：向外扩散消失 */
         @keyframes burstHeart {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
-            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            60% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); } 
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5); /* 初始很小 */
+            }
+            10% {
+                opacity: 1; /* 快速显现 */
+                transform: translate(-50%, -50%) scale(1); /* 回到正常大小 */
+            }
+            100% {
+                opacity: 0; /* 最后消失 */
+                /* 🚀 关键：扩散到 4 倍大小，形成向外爆开的效果 */
+                transform: translate(-50%, -50%) scale(4.0); 
+            }
         }
     </style>
 </head>
@@ -166,20 +177,16 @@
         }
 
         yesBtn.addEventListener('click', () => {
-            // 1. 修改文字为 6 个 E
             mainTitle.innerText = "!!!YEEEEEES!!!";
             mainTitle.style.fontSize = "3rem"; 
             btnGroup.style.display = 'none';   
             
-            // 2. 开始持续 5.5 秒的爱心雨
             startFallingHearts();
 
-            // 3. 🚀 关键修改：等待 9.5 秒！
-            // 5.5秒生成完毕 + 最后一批爱心下落的 4秒 = 9.5秒
-            // 此时屏幕恰好清空，巨大爱心完美接棒出场
+            // 🚀 关键修改：提前到 8 秒 (9.5 - 1.5 = 8)
             setTimeout(() => {
                 createBigHeart();
-            }, 9500); 
+            }, 8000); 
         });
 
         function startFallingHearts() {
@@ -203,7 +210,6 @@
                 }
             }, 30); 
 
-            // 5.5 秒后停止生成下落的爱心
             setTimeout(() => {
                 clearInterval(interval);
             }, 5500);
@@ -212,7 +218,8 @@
         function createBigHeart() {
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-            const scale = 20; 
+            // 🚀 修改：尺寸缩小到 15
+            const scale = 15; 
             const particles = 100; 
             
             for (let i = 0; i < particles; i++) {
@@ -231,9 +238,10 @@
 
                 document.body.appendChild(heart);
 
+                // 🚀 清理时间同步缩短到 3秒 (动画是2.5s)
                 setTimeout(() => {
                     heart.remove();
-                }, 4000); 
+                }, 3000); 
             }
         }
 
