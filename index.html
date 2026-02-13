@@ -90,7 +90,7 @@
             100% { transform: translateY(-110vh) translateX(100px) rotate(20deg); opacity: 0; }
         }
 
-        /* === 鼠标跟随小爱心 === */
+        /* === 鼠标跟随深色爱心 (温柔冒泡) === */
         .pop-heart {
             position: fixed; 
             color: #d60000;  
@@ -102,41 +102,6 @@
         @keyframes popUp {
             0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
             100% { transform: translate(-50%, -80px) scale(1.2) rotate(20deg); opacity: 0; }
-        }
-
-        /* === 🚀 关键新增：组成大爱心的小粒子 === */
-        .shape-heart {
-            position: fixed;
-            color: #ff0000; /* 鲜艳的红 */
-            font-size: 25px; /* 粒子大小 */
-            pointer-events: none;
-            z-index: 200; /* 确保在最最上层 */
-            opacity: 0; /* 初始不可见 */
-            transform: translate(-50%, -50%);
-            animation: burstHeart 1.5s forwards ease-out;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* 加一点发光效果 */
-        }
-
-        /* 大爱心的动画：从中心炸开并闪烁 */
-        @keyframes burstHeart {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0);
-            }
-            20% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.2); /* 弹一下 */
-            }
-            40% {
-                transform: translate(-50%, -50%) scale(1); /* 回缩一点 */
-            }
-            80% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1.5); /* 最后放大消失 */
-            }
         }
 
     </style>
@@ -178,55 +143,10 @@
             noBtn.style.bottom = 'auto';
         }
 
-        // === 🚀 Yes 按钮点击事件 (核心修改) ===
+        // === Yes 按钮点击逻辑 (回归简单) ===
         yesBtn.addEventListener('click', () => {
-            // 1. 先触发大爱心特效
-            createBigHeart();
-            
-            // 2. 延迟一点点再弹出文字，让用户先看特效
-            setTimeout(() => {
-                alert("我就知道你会答应的！爱死你了！❤️");
-            }, 500);
+            alert("我就知道你会答应的！爱死你了！❤️");
         });
-
-        // === 🚀 绘制大爱心的函数 (数学魔法) ===
-        function createBigHeart() {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            // 缩放比例，数值越大爱心越大
-            const scale = 15; 
-            
-            // 我们生成 50 个小爱心来组成轮廓
-            for (let i = 0; i < 50; i++) {
-                const heart = document.createElement('div');
-                heart.classList.add('shape-heart');
-                heart.innerHTML = '❤';
-                
-                // === 爱心公式 (Parametric Equation) ===
-                // t 从 0 到 2π
-                const t = (Math.PI * 2 * i) / 50; 
-                
-                // x = 16sin^3(t)
-                const x = 16 * Math.pow(Math.sin(t), 3);
-                // y = 13cos(t) - 5cos(2t) - 2cos(3t) - cos(4t)
-                // 注意：因为网页坐标y轴向下，所以这里y前面加了负号
-                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-
-                // 计算屏幕上的最终位置
-                heart.style.left = centerX + (x * scale) + 'px';
-                heart.style.top = centerY + (y * scale) + 'px';
-                
-                // 增加一点随机延迟，让它们不是同时出现，而是像“画”出来一样
-                heart.style.animationDelay = (i * 0.02) + 's';
-
-                document.body.appendChild(heart);
-
-                // 动画结束后清理
-                setTimeout(() => {
-                    heart.remove();
-                }, 2000);
-            }
-        }
 
         // 鼠标静止/移动冒泡逻辑
         let heartInterval;
