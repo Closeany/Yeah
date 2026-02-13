@@ -51,7 +51,6 @@
             bottom: 0; 
         }
 
-        /* === Yes 按钮 === */
         #yesBtn {
             background-color: #ff4d4d;
             color: white;
@@ -65,7 +64,6 @@
             background-color: #ff3333;
         }
 
-        /* === No 按钮 === */
         #noBtn {
             background-color: #e0e0e0;
             color: #333;
@@ -171,48 +169,52 @@
         function startStackingHearts() {
             let currentPileHeight = 0; 
             
+            // 🚀 修改 1：生成频率设为 20ms (每秒 50个)
+            // 相比之前的 5ms (每秒 200~600个)，这能大大减轻浏览器负担
             const interval = setInterval(() => {
                 
-                // 每次生成 3 个，保持暴雪密度
-                for(let i=0; i<3; i++) {
-                    const heart = document.createElement('div');
-                    heart.classList.add('falling-heart');
-                    heart.innerHTML = '❤';
-                    
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    
-                    const size = Math.random() * 30 + 30; 
-                    heart.style.fontSize = size + 'px';
+                // 每次生成 1 个足矣，因为我们把尺寸变大了
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                heart.innerHTML = '❤';
+                
+                heart.style.left = Math.random() * 100 + 'vw';
+                
+                // 🚀 修改 2：爱心变大 (30px ~ 70px)
+                // 大爱心能更快填满屏幕，不需要那么多个数量
+                const size = Math.random() * 40 + 30; 
+                heart.style.fontSize = size + 'px';
 
-                    // 🚀 关键修改：上涨速度极慢 (0.002)
-                    // 以前是 0.01，现在慢了5倍
-                    // 效果：每一层都会被几千个爱心填满后，才会稍微长高一点点
-                    if (currentPileHeight < 90) { 
-                        currentPileHeight += 0.005; 
-                    }
-
-                    const randomOffset = Math.random() * 10 - 5; 
-                    const targetTop = (100 - currentPileHeight + randomOffset);
-                    
-                    heart.style.setProperty('--target-top', targetTop + 'vh');
-                    
-                    const randomRotate = Math.random() * 360 + 'deg';
-                    heart.style.setProperty('--random-rotate', randomRotate);
-                    
-                    const randomX = (Math.random() * 20 - 10) + 'px';
-                    heart.style.setProperty('--random-x', randomX);
-
-                    const duration = Math.random() * 1 + 0.5;
-                    heart.style.setProperty('--fall-duration', duration + 's');
-
-                    document.body.appendChild(heart);
+                // 🚀 修改 3：堆积速度设为 0.02
+                // 这个速度经过计算：
+                // 填满 90vh 大约需要 4500 个爱心 (90 / 0.02 = 4500)
+                // 按每秒 50 个的速度，大概能下 90秒 的爱心雨，直到填满
+                if (currentPileHeight < 90) { 
+                    currentPileHeight += 0.02; 
                 }
 
-                if (document.querySelectorAll('.falling-heart').length > 6000) {
+                const randomOffset = Math.random() * 10 - 5; 
+                const targetTop = (100 - currentPileHeight + randomOffset);
+                
+                heart.style.setProperty('--target-top', targetTop + 'vh');
+                
+                const randomRotate = Math.random() * 360 + 'deg';
+                heart.style.setProperty('--random-rotate', randomRotate);
+                
+                const randomX = (Math.random() * 20 - 10) + 'px';
+                heart.style.setProperty('--random-x', randomX);
+
+                const duration = Math.random() * 1 + 0.5;
+                heart.style.setProperty('--fall-duration', duration + 's');
+
+                document.body.appendChild(heart);
+
+                // 限制设为 5000，配合上面的计算，正好在填满屏幕前不会停止
+                if (document.querySelectorAll('.falling-heart').length > 5000) {
                      clearInterval(interval); 
                 }
 
-            }, 5); 
+            }, 20); 
         }
 
         // 鼠标跟随爱心逻辑
