@@ -17,7 +17,6 @@
             position: relative; 
         }
 
-        /* 中间对话框 */
         .container {
             text-align: center;
             background: white;
@@ -27,12 +26,15 @@
             position: relative; 
             z-index: 10; 
             width: 350px; 
+            /* 加上平滑过渡，防止文字改变时框框瞬间跳动 */
+            transition: all 0.3s ease;
         }
 
         h1 {
             color: #ff4d4d;
             font-size: 2.5rem;
             margin-bottom: 30px;
+            transition: all 0.3s ease;
         }
 
         .btn-group {
@@ -69,22 +71,6 @@
             right: 50px; 
         }
 
-        /* 堆积爱心的样式 */
-        .falling-heart {
-            position: fixed;
-            color: #cc0000; 
-            z-index: 999; 
-            pointer-events: none; 
-            top: -30vh; 
-            animation: fallToStack var(--fall-duration) linear forwards;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        @keyframes fallToStack {
-            0% { top: -30vh; transform: translateX(0) rotate(0deg); }
-            100% { top: var(--target-top); transform: translateX(var(--random-x)) rotate(var(--random-rotate)); }
-        }
-
         /* 背景装饰爱心 */
         .heart-bg {
             position: absolute;
@@ -108,6 +94,42 @@
             0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
             100% { transform: translate(-50%, -80px) scale(1.2) rotate(20deg); opacity: 0; }
         }
+
+        /* 🚀 1. 掉落并消失的爱心雨 */
+        .falling-heart {
+            position: fixed;
+            color: #cc0000; 
+            z-index: 999; 
+            pointer-events: none; 
+            top: -10vh; 
+            animation: fallDown var(--fall-duration) linear forwards;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        @keyframes fallDown {
+            0% { top: -10vh; transform: translateX(0) rotate(0deg); opacity: 1; }
+            80% { opacity: 1; } /* 掉到 80% 的时候还是可见的 */
+            100% { top: 110vh; transform: translateX(var(--random-x)) rotate(var(--random-rotate)); opacity: 0; } /* 掉出屏幕并完全透明 */
+        }
+
+        /* 🚀 2. 组成巨大爱心的小粒子 */
+        .shape-heart {
+            position: fixed;
+            color: #ff0000;
+            font-size: 25px;
+            pointer-events: none;
+            z-index: 1000; 
+            /* 持续 3.5 秒的绽放消散动画 */
+            animation: burstHeart 3.5s forwards ease-in-out; 
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.6); 
+        }
+
+        /* 巨型爱心的生命周期：出现 -> 变大 -> 再变大并消失 */
+        @keyframes burstHeart {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            60% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); } 
+        }
     </style>
 </head>
 <body>
@@ -115,8 +137,8 @@
     <div id="hearts-container"></div>
 
     <div class="container">
-        <h1>Are u my valentine? 💖</h1>
-        <div class="btn-group">
+        <h1 id="mainTitle">Are u my valentine? 💖</h1>
+        <div class="btn-group" id="btnGroup">
             <div id="yesBtnContainer" style="position: absolute; left: 50px; bottom: 0;">
                  <button id="yesBtn" style="position: relative; left: auto; bottom: auto;">Yes! 😍</button>
             </div>
@@ -128,6 +150,8 @@
         const noBtn = document.getElementById('noBtn');
         const yesBtnContainer = document.getElementById('yesBtnContainer'); 
         const yesBtn = document.getElementById('yesBtn');
+        const mainTitle = document.getElementById('mainTitle');
+        const btnGroup = document.getElementById('btnGroup');
         
         // No 按钮闪避逻辑
         noBtn.addEventListener('mouseover', moveButton);
@@ -145,43 +169,83 @@
             noBtn.style.bottom = 'auto';
         }
 
-        // Yes 点击后的堆积逻辑
+        // === 🚀 核心剧本编排：点击 Yes 之后发生的事情 ===
         yesBtn.addEventListener('click', () => {
-            startStackingHearts();
+            // 1. 改变文字，隐藏按钮
+            mainTitle.innerText = "!!!YEEEEEEEEEES!!!";
+            mainTitle.style.fontSize = "3rem"; // 字变大一点更有气势
+            btnGroup.style.display = 'none';   // 按钮区彻底消失
+            
+            // 2. 开始持续 5.5 秒的爱心雨
+            startFallingHearts();
+
+            // 3. 在 5.5 秒之后（爱心雨停了），召唤巨大爱心！
+            setTimeout(() => {
+                createBigHeart();
+            }, 5500); 
         });
 
-        function startStackingHearts() {
-            let currentPileHeight = 10; // 初始悬空地基
-            
+        // 产生掉落并消失的爱心雨
+        function startFallingHearts() {
             const interval = setInterval(() => {
-                // 🚀 核心修复：一旦上涨到 40%，立即清除定时器并彻底停止生成
-                if (currentPileHeight >= 40) { 
-                     clearInterval(interval); 
-                     return; 
+                // 每次循环生成 2 个，密度刚刚好
+                for(let i=0; i<2; i++){
+                    const heart = document.createElement('div');
+                    heart.classList.add('falling-heart');
+                    heart.innerHTML = '❤';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
+
+                    heart.style.setProperty('--random-rotate', Math.random() * 360 + 'deg');
+                    heart.style.setProperty('--random-x', (Math.random() * 60 - 30) + 'px'); // 左右飘一点
+                    
+                    // 下落时间 2 到 4 秒不等
+                    const duration = Math.random() * 2 + 2; 
+                    heart.style.setProperty('--fall-duration', duration + 's');
+
+                    document.body.appendChild(heart);
+
+                    // 动画结束后把这个爱心从网页里删掉，防止卡顿
+                    setTimeout(() => { heart.remove(); }, duration * 1000);
                 }
+            }, 30); // 每 30 毫秒生成一次
 
+            // 规定这场雨下 5.5 秒钟，时间到了就关掉水龙头
+            setTimeout(() => {
+                clearInterval(interval);
+            }, 5500);
+        }
+
+        // 用数学公式画一个巨大的爱心
+        function createBigHeart() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const scale = 20; // 巨型爱心的尺寸系数
+            const particles = 100; // 由 100 个小爱心拼成
+            
+            for (let i = 0; i < particles; i++) {
                 const heart = document.createElement('div');
-                heart.classList.add('falling-heart');
+                heart.classList.add('shape-heart');
                 heart.innerHTML = '❤';
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.fontSize = (Math.random() * 40 + 30) + 'px';
+                
+                // 心形参数方程
+                const t = (Math.PI * 2 * i) / particles; 
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
 
-                // 持续上涨，直到达到 40
-                currentPileHeight += 0.06; 
-
-                const targetTop = (100 - currentPileHeight + (Math.random() * 10 - 5));
-                heart.style.setProperty('--target-top', targetTop + 'vh');
-                heart.style.setProperty('--random-rotate', Math.random() * 360 + 'deg');
-                heart.style.setProperty('--random-x', (Math.random() * 20 - 10) + 'px');
-                heart.style.setProperty('--fall-duration', (Math.random() * 1 + 0.5) + 's');
+                heart.style.left = centerX + (x * scale) + 'px';
+                heart.style.top = centerY + (y * scale) + 'px';
+                
+                // 给粒子加上一点随机的延迟，让出现和消失更有层次感
+                heart.style.animationDelay = (Math.random() * 0.3) + 's';
 
                 document.body.appendChild(heart);
-                
-                // 保底安全机制：如果数量太多还没到高度，也停掉（防止内存溢出）
-                if (document.querySelectorAll('.falling-heart').length >= 4000) {
-                     clearInterval(interval);
-                }
-            }, 20); 
+
+                // 动画播完后清理掉
+                setTimeout(() => {
+                    heart.remove();
+                }, 4000); // 3.5秒动画 + 0.5秒缓冲
+            }
         }
 
         // 鼠标跟随冒泡
