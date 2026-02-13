@@ -151,13 +151,13 @@
         });
 
         function startStackingHearts() {
-            let currentPileHeight = 10; // 初始地基
+            let currentPileHeight = 10; // 初始悬空地基
             
             const interval = setInterval(() => {
-                // 🚀 核心检查：如果达到上限，立即清除定时器并停止
+                // 检查上限，达到 2000 个则停止生成
                 if (document.querySelectorAll('.falling-heart').length >= 2000) {
                      clearInterval(interval); 
-                     return; // 停止执行后续生成代码
+                     return; 
                 }
 
                 const heart = document.createElement('div');
@@ -166,8 +166,8 @@
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.fontSize = (Math.random() * 40 + 30) + 'px';
 
-                // 堆积高度上限 60% (5分之3)
-                if (currentPileHeight < 60) { 
+                // 🚀 上限改为 40 (即 40%)
+                if (currentPileHeight < 40) { 
                     currentPileHeight += 0.06; 
                 }
 
