@@ -1,161 +1,9 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一个小问题...</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #ffe6e6;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden; 
-            position: relative; 
-        }
-
-        /* 中间对话框 */
-        .container {
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative; 
-            z-index: 10; 
-            width: 350px; 
-        }
-
-        h1 {
-            color: #ff4d4d;
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-        }
-
-        .btn-group {
-            position: relative;
-            height: 60px;
-            width: 100%; 
-        }
-
-        button {
-            padding: 10px 30px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            z-index: 100; 
-            position: absolute; 
-            bottom: 0; 
-        }
-
-        #yesBtn {
-            background-color: #ff4d4d;
-            color: white;
-            box-shadow: 0 4px 6px rgba(255, 77, 77, 0.3);
-            transition: all 0.3s ease; 
-            left: 50px;
-            z-index: 101;
-        }
-        #yesBtn:hover { transform: scale(1.1); background-color: #ff3333; }
-
-        #noBtn {
-            background-color: #e0e0e0;
-            color: #333;
-            transition: all 0.05s ease; 
-            right: 50px; 
-        }
-
-        /* 堆积爱心的样式 */
-        .falling-heart {
-            position: fixed;
-            color: #cc0000; 
-            z-index: 999; 
-            pointer-events: none; 
-            top: -30vh; 
-            animation: fallToStack var(--fall-duration) linear forwards;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        @keyframes fallToStack {
-            0% { top: -30vh; transform: translateX(0) rotate(0deg); }
-            100% { top: var(--target-top); transform: translateX(var(--random-x)) rotate(var(--random-rotate)); }
-        }
-
-        /* 背景装饰爱心 */
-        .heart-bg {
-            position: absolute;
-            color: #ff9999; 
-            top: 100%; 
-            z-index: 0; 
-            user-select: none; 
-            pointer-events: none;
-        }
-        @keyframes floatHeart {
-            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translateY(-110vh) translateX(100px) rotate(20deg); opacity: 0; }
-        }
-
-        /* 鼠标悬停冒泡爱心 */
-        .pop-heart {
-            position: fixed; color: #d60000; font-size: 20px; pointer-events: none; z-index: 102; animation: popUp 2.0s forwards ease-out;
-        }
-        @keyframes popUp {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-            100% { transform: translate(-50%, -80px) scale(1.2) rotate(20deg); opacity: 0; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="hearts-container"></div>
-
-    <div class="container">
-        <h1>Are u my valentine? 💖</h1>
-        <div class="btn-group">
-            <div id="yesBtnContainer" style="position: absolute; left: 50px; bottom: 0;">
-                 <button id="yesBtn" style="position: relative; left: auto; bottom: auto;">Yes! 😍</button>
-            </div>
-            <button id="noBtn">No 😢</button>
-        </div>
-    </div>
-
-    <script>
-        const noBtn = document.getElementById('noBtn');
-        const yesBtnContainer = document.getElementById('yesBtnContainer'); 
-        const yesBtn = document.getElementById('yesBtn');
-        
-        // No 按钮闪避逻辑
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('touchstart', moveButton);
-        function moveButton() {
-            const range = 200; 
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            const randomOffsetX = (Math.random() * range * 2) - range;
-            const randomOffsetY = (Math.random() * range * 2) - range;
-            noBtn.style.position = 'fixed'; 
-            noBtn.style.left = (centerX + randomOffsetX - noBtn.offsetWidth / 2) + 'px';
-            noBtn.style.top = (centerY + randomOffsetY - noBtn.offsetHeight / 2) + 'px';
-            noBtn.style.right = 'auto';
-            noBtn.style.bottom = 'auto';
-        }
-
-        // Yes 点击后的堆积逻辑
-        yesBtn.addEventListener('click', () => {
-            startStackingHearts();
-        });
-
-        function startStackingHearts() {
+function startStackingHearts() {
             let currentPileHeight = 10; // 初始悬空地基
             
             const interval = setInterval(() => {
-                // 检查上限，达到 2000 个则停止生成
-                if (document.querySelectorAll('.falling-heart').length >= 2000) {
+                // 🚀 核心修复：一旦上涨到 40%，立即清除定时器并彻底停止生成
+                if (currentPileHeight >= 40) { 
                      clearInterval(interval); 
                      return; 
                 }
@@ -166,10 +14,8 @@
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.fontSize = (Math.random() * 40 + 30) + 'px';
 
-                // 🚀 上限改为 40 (即 40%)
-                if (currentPileHeight < 40) { 
-                    currentPileHeight += 0.06; 
-                }
+                // 持续上涨，直到达到 40
+                currentPileHeight += 0.06; 
 
                 const targetTop = (100 - currentPileHeight + (Math.random() * 10 - 5));
                 heart.style.setProperty('--target-top', targetTop + 'vh');
@@ -178,43 +24,10 @@
                 heart.style.setProperty('--fall-duration', (Math.random() * 1 + 0.5) + 's');
 
                 document.body.appendChild(heart);
+                
+                // 保底安全机制：如果数量太多还没到高度，也停掉（防止内存溢出）
+                if (document.querySelectorAll('.falling-heart').length >= 4000) {
+                     clearInterval(interval);
+                }
             }, 20); 
         }
-
-        // 鼠标跟随冒泡
-        let heartInterval;
-        let currentX = 0, currentY = 0;
-        yesBtnContainer.addEventListener('mouseenter', (e) => {
-            currentX = e.clientX; currentY = e.clientY;
-            if (heartInterval) clearInterval(heartInterval);
-            heartInterval = setInterval(() => {
-                const heart = document.createElement('div');
-                heart.classList.add('pop-heart');
-                heart.innerHTML = '❤';
-                heart.style.left = currentX + 'px';
-                heart.style.top = currentY + 'px';
-                heart.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 40 - 20}deg)`;
-                document.body.appendChild(heart);
-                setTimeout(() => { heart.remove(); }, 2000);
-            }, 300); 
-        });
-        yesBtnContainer.addEventListener('mousemove', (e) => { currentX = e.clientX; currentY = e.clientY; });
-        yesBtnContainer.addEventListener('mouseleave', () => { clearInterval(heartInterval); });
-
-        // 背景装饰
-        function createHearts() {
-            setInterval(() => {
-                const heart = document.createElement('div');
-                heart.classList.add('heart-bg');
-                heart.innerHTML = '❤'; 
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.fontSize = (Math.random() * 30 + 20) + 'px';
-                heart.style.animation = `floatHeart ${(Math.random() * 5 + 3)}s linear infinite`;
-                document.body.appendChild(heart);
-                setTimeout(() => { heart.remove(); }, 8000);
-            }, 100); 
-        }
-        createHearts();
-    </script>
-</body>
-</html>
