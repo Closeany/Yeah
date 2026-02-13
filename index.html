@@ -108,14 +108,15 @@
             color: #cc0000; 
             z-index: 999; 
             pointer-events: none; 
-            top: -10vh; 
+            /* 依然保持高空坠落 */
+            top: -30vh; 
             animation: fallToStack var(--fall-duration) linear forwards;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         @keyframes fallToStack {
             0% {
-                top: -10vh;
+                top: -30vh;
                 transform: translateX(0) rotate(0deg);
             }
             100% {
@@ -167,30 +168,25 @@
         });
 
         function startStackingHearts() {
-            let currentPileHeight = 0; 
             
-            // 🚀 修改 1：生成频率设为 20ms (每秒 50个)
-            // 相比之前的 5ms (每秒 200~600个)，这能大大减轻浏览器负担
+            // 🚀 关键修改：初始高度设为 10
+            // 0 代表最底端。10 代表离底端还有 10% 的距离（大约悬空 10vh）
+            // 这样爱心就会从稍微高一点的“虚空地板”开始堆积
+            let currentPileHeight = 10; 
+            
             const interval = setInterval(() => {
-                
-                // 每次生成 1 个足矣，因为我们把尺寸变大了
                 const heart = document.createElement('div');
                 heart.classList.add('falling-heart');
                 heart.innerHTML = '❤';
                 
                 heart.style.left = Math.random() * 100 + 'vw';
                 
-                // 🚀 修改 2：爱心变大 (30px ~ 70px)
-                // 大爱心能更快填满屏幕，不需要那么多个数量
                 const size = Math.random() * 40 + 30; 
                 heart.style.fontSize = size + 'px';
 
-                // 🚀 修改 3：堆积速度设为 0.02
-                // 这个速度经过计算：
-                // 填满 90vh 大约需要 4500 个爱心 (90 / 0.02 = 4500)
-                // 按每秒 50 个的速度，大概能下 90秒 的爱心雨，直到填满
+                // 堆积速度 0.06 (爽快版)
                 if (currentPileHeight < 90) { 
-                    currentPileHeight += 0.02; 
+                    currentPileHeight += 0.06; 
                 }
 
                 const randomOffset = Math.random() * 10 - 5; 
@@ -209,8 +205,7 @@
 
                 document.body.appendChild(heart);
 
-                // 限制设为 5000，配合上面的计算，正好在填满屏幕前不会停止
-                if (document.querySelectorAll('.falling-heart').length > 5000) {
+                if (document.querySelectorAll('.falling-heart').length > 2000) {
                      clearInterval(interval); 
                 }
 
