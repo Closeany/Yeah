@@ -58,7 +58,6 @@
             box-shadow: 0 4px 6px rgba(255, 77, 77, 0.3);
             transition: all 0.3s ease; 
             left: 50px;
-            /* 🚀 新增：为了让冒出来的爱心不被按钮挡住，稍微提高一点层级 */
             z-index: 101;
         }
         #yesBtn:hover {
@@ -74,7 +73,7 @@
             right: 50px; 
         }
 
-        /* === 1. 背景淡爱心 (旧) === */
+        /* === 背景淡爱心 === */
         .heart-bg {
             position: absolute;
             color: #ff9999; 
@@ -91,26 +90,26 @@
             100% { transform: translateY(-110vh) translateX(100px) rotate(20deg); opacity: 0; }
         }
 
-        /* === 🚀 2. 新增：鼠标跟随深色爱心 (新) === */
+        /* === 🚀 鼠标跟随深色爱心 (修改部分) === */
         .pop-heart {
-            position: fixed; /* 使用 fixed 定位，跟随鼠标 */
-            color: #d60000;  /* 颜色更深，鲜艳的红 */
-            font-size: 20px; /* 不需要太大 */
-            pointer-events: none; /* 极其重要：让鼠标穿透它，否则会挡住按钮点击 */
-            z-index: 102; /* 在最上层 */
-            /* 应用短促的上浮动画 */
-            animation: popUp 0.8s forwards ease-out;
+            position: fixed; 
+            color: #d60000;  
+            font-size: 20px; 
+            pointer-events: none; 
+            z-index: 102; 
+            
+            /* 🚀 修改1：时间改长到 1.5s，让它有时间飘上去 */
+            animation: popUp 1.5s forwards ease-out;
         }
 
-        /* 新增爱心冒泡动画：向上飘一点点然后消失 */
         @keyframes popUp {
             0% {
-                transform: translate(-50%, -50%) scale(0.5); /* 从鼠标中心开始，稍微小一点 */
+                transform: translate(-50%, -50%) scale(0.5); 
                 opacity: 1;
             }
             100% {
-                 /* 向上飘 60px，稍微变大，然后消失 */
-                transform: translate(-50%, -100px) scale(1.2) rotate(Math.random() * 30 + 'deg');
+                 /* 🚀 修改2：距离改成 -300px，飘得非常高！ */
+                transform: translate(-50%, -300px) scale(1.2) rotate(20deg);
                 opacity: 0;
             }
         }
@@ -133,11 +132,9 @@
 
     <script>
         const noBtn = document.getElementById('noBtn');
-        // 注意：这里获取的是新的容器
         const yesBtnContainer = document.getElementById('yesBtnContainer'); 
         const yesBtn = document.getElementById('yesBtn');
         
-        // === No 按钮逻辑 (保持不变) ===
         noBtn.addEventListener('mouseover', moveButton);
         noBtn.addEventListener('touchstart', moveButton);
         function moveButton() {
@@ -159,45 +156,27 @@
             alert("我就知道你会答应的！爱死你了！❤️");
         });
 
-        // === 🚀 新增：Yes 按钮鼠标跟随爱心逻辑 ===
-        
-        // 用于限制爱心生成频率，防止卡顿
+        // 鼠标跟随爱心逻辑
         let lastHeartTime = 0;
-
-        // 监听鼠标在 Yes 按钮容器上的移动
         yesBtnContainer.addEventListener('mousemove', function(e) {
             const now = Date.now();
-            // 节流阀：每 50毫秒才生成一个爱心，避免生成太多
             if (now - lastHeartTime < 50) return;
             lastHeartTime = now;
-
             createPopHeart(e.clientX, e.clientY);
         });
 
-        // 创建跟随鼠标的爱心函数
         function createPopHeart(x, y) {
             const heart = document.createElement('div');
             heart.classList.add('pop-heart');
             heart.innerHTML = '❤';
-            
-            // 设置爱心位置为鼠标当前坐标
-            // CSS 中已经用 translate(-50%, -50%) 做了中心对齐
             heart.style.left = x + 'px';
             heart.style.top = y + 'px';
-            
-            // 随机稍微旋转一下，更自然
             heart.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 40 - 20}deg)`;
-
             document.body.appendChild(heart);
-
-            // 0.8秒动画结束后删除元素
-            setTimeout(() => {
-                heart.remove();
-            }, 800);
+            setTimeout(() => { heart.remove(); }, 1500); // 记得这里也要改成 1500ms (1.5s)
         }
 
-
-        // === 背景淡爱心逻辑 (保持不变) ===
+        // 背景淡爱心逻辑
         function createHearts() {
             setInterval(() => {
                 const heart = document.createElement('div');
@@ -209,9 +188,7 @@
                 const duration = Math.random() * 5 + 3;
                 heart.style.animation = `floatHeart ${duration}s linear infinite`;
                 document.body.appendChild(heart);
-                setTimeout(() => {
-                    heart.remove();
-                }, duration * 1000);
+                setTimeout(() => { heart.remove(); }, duration * 1000);
             }, 100); 
         }
         createHearts();
