@@ -98,8 +98,8 @@
             pointer-events: none; 
             z-index: 102; 
             
-            /* 🚀 修改1：时间调回 1.0s，更干脆 */
-            animation: popUp 1.0s forwards ease-out;
+            /* 🚀 修改1：速度变慢，改成 2秒 */
+            animation: popUp 2.0s forwards ease-out;
         }
 
         @keyframes popUp {
@@ -108,8 +108,8 @@
                 opacity: 1;
             }
             100% {
-                 /* 🚀 修改2：距离改成 -150px (之前是 -300px) */
-                transform: translate(-50%, -150px) scale(1.2) rotate(20deg);
+                 /* 🚀 修改2：高度降低，只上浮 80px */
+                transform: translate(-50%, -80px) scale(1.2) rotate(20deg);
                 opacity: 0;
             }
         }
@@ -135,6 +135,7 @@
         const yesBtnContainer = document.getElementById('yesBtnContainer'); 
         const yesBtn = document.getElementById('yesBtn');
         
+        // No 按钮逻辑
         noBtn.addEventListener('mouseover', moveButton);
         noBtn.addEventListener('touchstart', moveButton);
         function moveButton() {
@@ -156,13 +157,40 @@
             alert("我就知道你会答应的！爱死你了！❤️");
         });
 
-        // 鼠标跟随爱心逻辑
-        let lastHeartTime = 0;
-        yesBtnContainer.addEventListener('mousemove', function(e) {
-            const now = Date.now();
-            if (now - lastHeartTime < 50) return;
-            lastHeartTime = now;
-            createPopHeart(e.clientX, e.clientY);
+        // === 🚀 鼠标跟随爱心逻辑 (大改版) ===
+        let heartInterval;
+        let currentX = 0;
+        let currentY = 0;
+
+        // 1. 鼠标移入：开始计时器，不断生成爱心
+        yesBtnContainer.addEventListener('mouseenter', (e) => {
+            currentX = e.clientX;
+            currentY = e.clientY;
+            
+            // 先清除可能存在的旧定时器
+            if (heartInterval) clearInterval(heartInterval);
+
+            // 立即生成一个，不要等待
+            createPopHeart(currentX, currentY);
+
+            // 🚀 修改3：启动定时器，每 300ms 生成一个 (频率降低)
+            heartInterval = setInterval(() => {
+                createPopHeart(currentX, currentY);
+            }, 300); 
+        });
+
+        // 2. 鼠标移动：只更新坐标，不负责生成 (为了支持静止)
+        yesBtnContainer.addEventListener('mousemove', (e) => {
+            currentX = e.clientX;
+            currentY = e.clientY;
+        });
+
+        // 3. 鼠标移出：清除计时器，停止生成
+        yesBtnContainer.addEventListener('mouseleave', () => {
+            if (heartInterval) {
+                clearInterval(heartInterval);
+                heartInterval = null;
+            }
         });
 
         function createPopHeart(x, y) {
@@ -171,11 +199,12 @@
             heart.innerHTML = '❤';
             heart.style.left = x + 'px';
             heart.style.top = y + 'px';
+            // 随机旋转角度
             heart.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 40 - 20}deg)`;
             document.body.appendChild(heart);
             
-            // 🚀 修改3：JS清理时间也要同步改成 1000ms
-            setTimeout(() => { heart.remove(); }, 1000); 
+            // 🚀 修改4：清理时间同步改成 2000ms (2s)
+            setTimeout(() => { heart.remove(); }, 2000); 
         }
 
         // 背景淡爱心逻辑
